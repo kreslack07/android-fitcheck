@@ -1,0 +1,5 @@
+{
+  "name": "Rork Outfit Rating AI",
+  "description": "An AI-powered fashion assistant that rates your outfits and provides personalized style advice using Gemini Vision.",
+  "requestFramePermissions": ["camera"]
+}
