@@ -4,8 +4,8 @@
  */
 
 import * as React from "react";
-import { useState, useRef, useCallback } from "react";
-import { Camera, Upload, Sparkles, CheckCircle2, AlertCircle, RefreshCcw, Star, Palette, Maximize2, Layers } from "lucide-react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { Camera, Upload, Sparkles, CheckCircle2, AlertCircle, RefreshCcw, Star, Palette, Maximize2, Layers, History, Clock, Trash2, Briefcase, Coffee, Heart, PartyPopper } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -13,18 +13,73 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { rateOutfit, type OutfitRating } from "@/src/lib/gemini";
+
+interface HistoryItem {
+  id: string;
+  image: string;
+  rating: OutfitRating;
+  occasion: string;
+  timestamp: number;
+}
+
+const OCCASIONS = [
+  { id: "General", icon: <Sparkles className="w-3 h-3" /> },
+  { id: "Casual", icon: <Coffee className="w-3 h-3" /> },
+  { id: "Formal", icon: <Briefcase className="w-3 h-3" /> },
+  { id: "Date", icon: <Heart className="w-3 h-3" /> },
+  { id: "Party", icon: <PartyPopper className="w-3 h-3" /> },
+];
 
 export default function App() {
   const [image, setImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [rating, setRating] = useState<OutfitRating | null>(null);
+  const [occasion, setOccasion] = useState("General");
+  const [history, setHistory] = useState<HistoryItem[]>([]);
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const savedHistory = localStorage.getItem("outfit_history");
+    if (savedHistory) {
+      try {
+        setHistory(JSON.parse(savedHistory));
+      } catch (e) {
+        console.error("Failed to load history", e);
+      }
+    }
+  }, []);
+
+  const saveToHistory = (newRating: OutfitRating, img: string) => {
+    const newItem: HistoryItem = {
+      id: Math.random().toString(36).substr(2, 9),
+      image: img,
+      rating: newRating,
+      occasion,
+      timestamp: Date.now(),
+    };
+    const updatedHistory = [newItem, ...history].slice(0, 10); // Keep last 10
+    setHistory(updatedHistory);
+    localStorage.setItem("outfit_history", JSON.stringify(updatedHistory));
+  };
+
+  const clearHistory = () => {
+    setHistory([]);
+    localStorage.removeItem("outfit_history");
+    toast.success("History cleared");
+  };
+
+  const deleteHistoryItem = (id: string) => {
+    const updatedHistory = history.filter(item => item.id !== id);
+    setHistory(updatedHistory);
+    localStorage.setItem("outfit_history", JSON.stringify(updatedHistory));
+  };
 
   const startCamera = async () => {
     try {
@@ -96,8 +151,9 @@ export default function App() {
     setIsAnalyzing(true);
     setRating(null);
     try {
-      const result = await rateOutfit(image, "image/jpeg");
+      const result = await rateOutfit(image, "image/jpeg", occasion);
       setRating(result);
+      saveToHistory(result, image);
       toast.success("Analysis complete!");
     } catch (err) {
       toast.error("Failed to analyze outfit. Please try again.");
@@ -114,7 +170,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-zinc-100 font-sans selection:bg-orange-500/30">
+    <div className="min-h-screen bg-[#0a0a0a] text-zinc-100 font-sans selection:bg-orange-500/30 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
       <Toaster position="top-center" theme="dark" />
       
       {/* Background Glow */}
@@ -123,9 +179,9 @@ export default function App() {
         <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full" />
       </div>
 
-      <main className="relative z-10 max-w-5xl mx-auto px-6 py-12">
+      <main className="relative z-10 max-w-5xl mx-auto px-4 md:px-6 py-8 md:py-12">
         {/* Header */}
-        <header className="mb-16 text-center">
+        <header className="mb-10 md:mb-16 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -134,19 +190,54 @@ export default function App() {
             <Badge variant="outline" className="mb-4 border-orange-500/50 text-orange-400 px-3 py-1">
               AI Fashion Assistant
             </Badge>
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-4 bg-gradient-to-b from-white to-zinc-500 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-7xl font-bold tracking-tighter mb-4 bg-gradient-to-b from-white to-zinc-500 bg-clip-text text-transparent">
               RORK OUTFIT RATING
             </h1>
-            <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
+            <p className="text-zinc-400 text-base md:text-lg max-w-2xl mx-auto px-4">
               Elevate your style with instant AI-powered feedback. Upload your look and get professional coordination advice.
             </p>
           </motion.div>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-          {/* Left Column: Upload/Preview */}
-          <section className="space-y-6">
-            <Card className="bg-zinc-900/50 border-zinc-800 backdrop-blur-xl overflow-hidden">
+        <Tabs defaultValue="rate" className="w-full">
+          <div className="flex justify-center mb-8">
+            <TabsList className="bg-zinc-900 border border-zinc-800 p-1">
+              <TabsTrigger value="rate" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white px-6">
+                <Sparkles className="w-4 h-4 mr-2" /> Rate Outfit
+              </TabsTrigger>
+              <TabsTrigger value="history" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white px-6">
+                <History className="w-4 h-4 mr-2" /> History
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          <TabsContent value="rate" className="mt-0">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-start">
+              {/* Left Column: Upload/Preview */}
+              <section className="space-y-6">
+                {/* Occasion Selector */}
+                {!image && !isCameraActive && (
+                  <div className="flex flex-wrap justify-center gap-2 mb-4">
+                    {OCCASIONS.map((occ) => (
+                      <Button
+                        key={occ.id}
+                        variant={occasion === occ.id ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setOccasion(occ.id)}
+                        className={`rounded-full transition-all ${
+                          occasion === occ.id 
+                            ? "bg-orange-600 hover:bg-orange-500 border-none" 
+                            : "border-zinc-800 text-zinc-400 hover:text-zinc-200"
+                        }`}
+                      >
+                        <span className="mr-2">{occ.icon}</span>
+                        {occ.id}
+                      </Button>
+                    ))}
+                  </div>
+                )}
+
+                <Card className="bg-zinc-900/50 border-zinc-800 backdrop-blur-xl overflow-hidden">
               <CardContent className="p-0 relative aspect-[3/4] flex items-center justify-center bg-zinc-950">
                 <AnimatePresence mode="wait">
                   {!image && !isCameraActive ? (
@@ -377,6 +468,78 @@ export default function App() {
             </AnimatePresence>
           </section>
         </div>
+      </TabsContent>
+
+          <TabsContent value="history" className="mt-0">
+            <div className="max-w-4xl mx-auto">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold flex items-center">
+                  <Clock className="w-6 h-6 mr-2 text-orange-500" /> Recent Ratings
+                </h2>
+                {history.length > 0 && (
+                  <Button variant="ghost" size="sm" onClick={clearHistory} className="text-zinc-500 hover:text-rose-400">
+                    <Trash2 className="w-4 h-4 mr-2" /> Clear All
+                  </Button>
+                )}
+              </div>
+
+              {history.length === 0 ? (
+                <div className="text-center py-20 border-2 border-dashed border-zinc-800 rounded-3xl">
+                  <History className="w-12 h-12 text-zinc-800 mx-auto mb-4" />
+                  <p className="text-zinc-500">No history yet. Start by rating an outfit!</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {history.map((item) => (
+                    <Card key={item.id} className="bg-zinc-900/50 border-zinc-800 overflow-hidden group">
+                      <div className="flex h-40">
+                        <div className="w-1/3 relative">
+                          <img src={item.image} alt="Rated outfit" className="w-full h-full object-cover" />
+                          <div className="absolute top-2 left-2">
+                            <Badge className="bg-orange-600 text-[10px] px-1.5 py-0">{item.rating.overallScore}/10</Badge>
+                          </div>
+                        </div>
+                        <div className="w-2/3 p-4 flex flex-col justify-between">
+                          <div>
+                            <div className="flex justify-between items-start mb-1">
+                              <span className="text-xs font-bold text-orange-400 uppercase tracking-tighter">{item.occasion}</span>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => deleteHistoryItem(item.id)}
+                              >
+                                <Trash2 className="w-3 h-3 text-zinc-600" />
+                              </Button>
+                            </div>
+                            <h4 className="text-sm font-bold text-zinc-200 line-clamp-1">{item.rating.styleCategory}</h4>
+                            <p className="text-xs text-zinc-500 line-clamp-3 mt-1 italic">"{item.rating.feedback}"</p>
+                          </div>
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="text-[10px] text-zinc-600">{new Date(item.timestamp).toLocaleDateString()}</span>
+                            <Button 
+                              variant="link" 
+                              className="p-0 h-auto text-xs text-orange-500"
+                              onClick={() => {
+                                setImage(item.image);
+                                setRating(item.rating);
+                                setOccasion(item.occasion);
+                                // Switch to rate tab
+                                document.querySelector('[value="rate"]')?.dispatchEvent(new MouseEvent('click', {bubbles: true}));
+                              }}
+                            >
+                              View Details
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
       </main>
 
       {/* Footer */}

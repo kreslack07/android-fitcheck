@@ -14,9 +14,9 @@ export interface OutfitRating {
   cons: string[];
 }
 
-export async function rateOutfit(imageBase64: string, mimeType: string): Promise<OutfitRating> {
-  const prompt = `Analyze this outfit and provide a detailed rating and feedback. 
-  Be honest but constructive. Consider style, color coordination, fit, and overall aesthetic.
+export async function rateOutfit(imageBase64: string, mimeType: string, occasion: string = "General"): Promise<OutfitRating> {
+  const prompt = `Analyze this outfit for a ${occasion} occasion and provide a detailed rating and feedback. 
+  Be honest but constructive. Consider style, color coordination, fit, and overall aesthetic suitability for the ${occasion} context.
   Return the analysis in JSON format.`;
 
   const response = await ai.models.generateContent({
