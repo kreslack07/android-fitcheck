@@ -1,0 +1,48 @@
+{
+  "packageId": "com.kreslack07.fitcheck",
+  "host": "android-fitcheck.vercel.app",
+  "name": "FitCheck",
+  "launcherName": "FitCheck",
+  "display": "standalone",
+  "orientation": "portrait",
+  "themeColor": "#ea580c",
+  "navigationColor": "#0a0a0a",
+  "navigationColorDark": "#0a0a0a",
+  "navigationDividerColor": "#0a0a0a",
+  "navigationDividerColorDark": "#0a0a0a",
+  "backgroundColor": "#0a0a0a",
+  "enableNotifications": false,
+  "startUrl": "/",
+  "iconUrl": "https://raw.githubusercontent.com/kreslack07/android-fitcheck/main/icons/icon-512.png",
+  "maskableIconUrl": "https://raw.githubusercontent.com/kreslack07/android-fitcheck/main/icons/icon-512.png",
+  "monochromeIconUrl": "https://raw.githubusercontent.com/kreslack07/android-fitcheck/main/icons/icon-192.png",
+  "appVersion": "1",
+  "appVersionName": "1.0.0",
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://android-fitcheck.vercel.app/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": true
+    },
+    "playBilling": {
+      "enabled": false
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://android-fitcheck.vercel.app/",
+  "minSdkVersion": 21,
+  "targetSdkVersion": 34,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "fitcheck"
+  },
+  "signingKeyPassphrase": "",
+  "storeKeyPassphrase": ""
+}
