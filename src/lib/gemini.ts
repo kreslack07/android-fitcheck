@@ -15,12 +15,10 @@ export interface OutfitRating {
 }
 
 export async function rateOutfit(imageBase64: string, mimeType: string, occasion: string = "General"): Promise<OutfitRating> {
-  const prompt = `Analyze this outfit for a ${occasion} occasion and provide a detailed rating and feedback. 
-  Be honest but constructive. Consider style, color coordination, fit, and overall aesthetic suitability for the ${occasion} context.
-  Return the analysis in JSON format.`;
+  const prompt = "Analyze this outfit for a " + occasion + " occasion and provide a detailed rating and feedback. Be honest but constructive. Consider style, color coordination, fit, and overall aesthetic suitability for the " + occasion + " context. Return the analysis in JSON format.";
 
   const response = await ai.models.generateContent({
-    model: "gemini-2.0-flash-exp", // Using flash for speed and vision capabilities
+    model: "gemini-2.0-flash",
     contents: [
       {
         parts: [
@@ -45,26 +43,14 @@ export async function rateOutfit(imageBase64: string, mimeType: string, occasion
           fitAndSilhouette: { type: Type.NUMBER, description: "Fit and silhouette score from 1 to 10" },
           versatility: { type: Type.NUMBER, description: "Versatility score from 1 to 10" },
           feedback: { type: Type.STRING, description: "Detailed feedback about the outfit" },
-          suggestions: {
-            type: Type.ARRAY,
-            items: { type: Type.STRING },
-            description: "List of suggestions to improve the outfit"
-          },
-          pros: {
-            type: Type.ARRAY,
-            items: { type: Type.STRING },
-            description: "What works well in this outfit"
-          },
-          cons: {
-            type: Type.ARRAY,
-            items: { type: Type.STRING },
-            description: "What could be improved"
-          },
+          suggestions: { type: Type.ARRAY, items: { type: Type.STRING }, description: "List of suggestions to improve the outfit" },
+          pros: { type: Type.ARRAY, items: { type: Type.STRING }, description: "What works well in this outfit" },
+          cons: { type: Type.ARRAY, items: { type: Type.STRING }, description: "What could be improved" },
         },
         required: ["overallScore", "styleCategory", "colorCoordination", "fitAndSilhouette", "versatility", "feedback", "suggestions", "pros", "cons"],
       },
     },
   });
 
-  return JSON.parse(response.text);
+  return JSON.parse(response.text());
 }
