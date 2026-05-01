@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.FitCheck" parent="Theme.AppCompat.NoActionBar">
+    <style name="Theme.FitCheck" parent="Theme.MaterialComponents.NoActionBar">
         <item name="android:windowBackground">@color/backgroundColor</item>
         <item name="android:statusBarColor">@color/colorPrimary</item>
     </style>
