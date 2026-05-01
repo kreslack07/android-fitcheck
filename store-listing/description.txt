@@ -1,0 +1,22 @@
+FitCheck - AI Outfit Rater
+
+Rate your outfits instantly with the power of Google Gemini AI. Upload a photo of your outfit and get professional fashion feedback in seconds.
+
+FEATURES:
+• AI-powered outfit analysis using Gemini Vision
+• Score your outfit across multiple dimensions: style, color coordination, fit & silhouette, and versatility
+• Get personalized suggestions to elevate your look
+• Rate for different occasions: General, Casual, Formal, Date Night, Party
+• Camera integration - snap a photo directly in the app
+• Outfit history - track your last 10 rated outfits
+• Works offline as a Progressive Web App
+
+HOW IT WORKS:
+1. Choose your occasion (Casual, Formal, Date, Party, or General)
+2. Upload a photo or take one with your camera
+3. Get instant AI feedback with scores and suggestions
+4. Save to history and track your style evolution
+
+Perfect for fashion enthusiasts, style beginners, or anyone who wants a second opinion before heading out the door.
+
+Powered by Google Gemini 2.0 Flash Vision AI.
