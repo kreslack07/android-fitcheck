@@ -11,11 +11,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -25,26 +20,29 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Bubblewrap
-        run: npm install -g @bubblewrap/cli
-
-      - name: Initialize TWA project
+      - name: Download Gradle wrapper
+        working-directory: android
         run: |
-          echo "n" | bubblewrap init --manifest https://raw.githubusercontent.com/kreslack07/android-fitcheck/main/manifest.json --directory twa-project
-        continue-on-error: true
+          curl -L https://services.gradle.org/distributions/gradle-8.2-bin.zip -o gradle.zip
+          unzip -q gradle.zip
+          mkdir -p gradle/wrapper
+          cp gradle-8.2/bin/gradle gradle/wrapper/ 2>/dev/null || true
 
-      - name: Build TWA APK with Gradle
+      - name: Make gradlew executable
+        working-directory: android
         run: |
-          cd twa-project
+          curl -L https://raw.githubusercontent.com/gradle/gradle/v8.2.0/gradlew -o gradlew
           chmod +x gradlew
-          ./gradlew bundleRelease assembleRelease --no-daemon
+
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
         env:
           JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fitcheck-release
-          path: |
-            twa-project/app/build/outputs/apk/release/*.apk
-            twa-project/app/build/outputs/bundle/release/*.aab
+          name: fitcheck-debug
+          path: android/app/build/outputs/apk/debug/*.apk
