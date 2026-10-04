@@ -545,14 +545,14 @@ export default function App() {
       {/* KRK funnel CTA */}
       <div className="mx-6 mt-16 rounded-2xl border border-orange-500/30 bg-gradient-to-r from-orange-500/10 to-amber-500/10 p-6 text-center">
         <p className="text-zinc-200 font-bold text-lg">Love upgrading your style?</p>
-        <p className="text-zinc-400 text-sm mt-1">Get the FREE KRK Budget Starter — plan the wardrobe you actually want.</p>
+        <p className="text-zinc-400 text-sm mt-1">Grab the KRK Student Productivity System — instant download, ~$13 AUD.</p>
         <a
-          href="https://kreslack2.gumroad.com/l/gmfkbw"
+          href="https://kreslack2.gumroad.com/l/krk-student-productivity-system"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block mt-4 rounded-xl bg-orange-500 px-6 py-3 font-bold text-black hover:bg-orange-400 transition-colors"
         >
-          Get It FREE
+          Get It Now
         </a>
       </div>
 
